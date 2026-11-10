@@ -1,0 +1,2 @@
+# Keep LF endings: run_lab.sh and the pipeline registries are parsed by bash.
+* text=auto eol=lf
