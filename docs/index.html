@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Research Lab — Aston University</title>
+<meta name="description" content="A multi-agent academic research workspace built on Claude Code. Five specialist AI agents, a gated 5-phase pipeline, and live scholarly search across 250M+ papers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════
+   TOKENS  ·  Academic instrument palette
+   Layout: full-bleed sections, constrained content
+═══════════════════════════════════════════════════════ */
+:root {
+  --navy:    #0C1E3C;
+  --navy2:   #152A50;
+  --cream:   #F6F3EC;
+  --paper:   #FDFBF7;
+  --gold:    #C9A040;
+  --gold-lt: #F0E4B8;
+  --cobalt:  #1D3D7E;
+  --azure:   #2960B8;
+  --rule:    #D8D0BF;
+  --muted:   #6A6050;
+  --faint:   #A09880;
+  --chip-bg: #EDE8DC;
+  --ok:      #2D6A4F;
+  --warn:    #B07A20;
+  --err:     #8B2030;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--navy);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+/* ─ Utilities ──────────────────────────────────────── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 12px; display: block;
+}
+h2 {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: clamp(24px, 3.5vw, 36px);
+  font-weight: 600; line-height: 1.15;
+  letter-spacing: -0.02em; color: var(--navy);
+  margin-bottom: 16px;
+}
+h3 {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--cobalt); margin-bottom: 8px;
+}
+p { color: var(--muted); max-width: 68ch; }
+a { color: var(--azure); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ─ Nav ────────────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(12,30,60,0.97);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(201,160,64,0.2);
+  padding: 0;
+}
+.nav-inner {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  height: 56px; padding: 0 24px;
+  max-width: 1100px; margin: 0 auto;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 12px;
+  color: white; font-family: 'Spectral', serif;
+  font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+  text-decoration: none;
+}
+.nav-logo .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold); flex-shrink: 0;
+}
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-link {
+  color: rgba(255,255,255,0.65); font-size: 13px;
+  padding: 6px 12px; border-radius: 4px;
+  transition: color .15s, background .15s;
+  text-decoration: none;
+}
+.nav-link:hover { color: white; background: rgba(255,255,255,0.08); text-decoration: none; }
+.nav-gh {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--gold); color: var(--navy);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  padding: 7px 14px; border-radius: 4px;
+  text-decoration: none; transition: opacity .15s;
+}
+.nav-gh:hover { opacity: 0.88; text-decoration: none; }
+
+/* ─ Hero ───────────────────────────────────────────── */
+.hero {
+  background: var(--navy);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(29,61,126,0.6) 0%, transparent 70%),
+    linear-gradient(180deg, #0C1E3C 0%, #071428 100%);
+  padding: 96px 0 80px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(201,160,64,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,160,64,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 24px;
+}
+.hero-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--gold); border: 1px solid rgba(201,160,64,0.4);
+  padding: 4px 12px; border-radius: 2px;
+}
+.hero h1 {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: clamp(38px, 7vw, 72px);
+  font-weight: 700; line-height: 1.0;
+  letter-spacing: -0.03em; color: white;
+  margin-bottom: 20px;
+}
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero-sub {
+  font-size: clamp(15px, 2vw, 18px);
+  color: rgba(255,255,255,0.6);
+  max-width: 56ch; line-height: 1.6;
+  margin-bottom: 36px;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.hero-stats {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 40px;
+}
+.hstat {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 18px; border-radius: 2px;
+  display: flex; align-items: baseline; gap: 8px;
+}
+.hstat .n {
+  font-family: 'Spectral', serif;
+  font-size: 26px; font-weight: 700;
+  color: var(--gold); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.hstat .l {
+  font-size: 12px; color: rgba(255,255,255,0.5);
+  font-family: 'Source Sans 3', sans-serif;
+}
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--gold); color: var(--navy);
+  font-weight: 600; font-size: 14px; letter-spacing: 0.02em;
+  padding: 12px 24px; border-radius: 2px;
+  text-decoration: none; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: 0.88; text-decoration: none; }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: rgba(255,255,255,0.8);
+  font-size: 14px; letter-spacing: 0.02em;
+  padding: 12px 24px; border-radius: 2px;
+  border: 1px solid rgba(255,255,255,0.2);
+  text-decoration: none; transition: border-color .15s, color .15s;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.5); color: white; text-decoration: none; }
+
+/* ─ About ──────────────────────────────────────────── */
+.about { padding: 80px 0; border-bottom: 1px solid var(--rule); }
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: start;
+}
+.about-desc { font-size: 17px; line-height: 1.75; color: var(--muted); }
+.about-desc p + p { margin-top: 16px; }
+.principles { display: flex; flex-direction: column; gap: 16px; }
+.principle {
+  display: flex; gap: 14px;
+  padding: 16px; background: var(--cream);
+  border-left: 3px solid var(--gold);
+}
+.principle-icon { font-size: 18px; flex-shrink: 0; }
+.principle strong { display: block; font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+.principle p { font-size: 12px; color: var(--muted); max-width: none; line-height: 1.5; }
+
+/* ─ Pipeline ───────────────────────────────────────── */
+.pipeline-section { padding: 80px 0; background: var(--cream); border-bottom: 1px solid var(--rule); }
+.pipeline-flow {
+  display: flex; overflow-x: auto;
+  gap: 0; padding-bottom: 8px; align-items: stretch;
+  margin-top: 40px;
+}
+.phase {
+  flex: 0 0 190px; min-width: 0;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-right: none; padding: 20px 18px;
+  position: relative;
+}
+.phase:first-child { border-left: 1px solid var(--rule); }
+.phase:last-child  { border-right: 1px solid var(--rule); }
+.phase-top {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 12px;
+}
+.phase-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--navy); color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.phase-num.gold { background: var(--gold); color: var(--navy); }
+.phase-id-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--faint);
+}
+.phase-name {
+  font-family: 'Spectral', serif;
+  font-size: 14px; font-weight: 600;
+  color: var(--navy); margin-bottom: 8px; line-height: 1.3;
+}
+.phase-owner {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--cobalt);
+  background: rgba(29,61,126,0.08);
+  padding: 2px 8px; border-radius: 2px;
+  display: inline-block; margin-bottom: 10px;
+}
+.phase-del { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.phase-del code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--faint);
+  background: var(--chip-bg); padding: 1px 4px; border-radius: 2px;
+}
+.phase-arrow {
+  flex: 0 0 20px; display: flex; align-items: center; justify-content: center;
+  color: var(--gold); font-size: 16px;
+  border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+/* ─ Agents ─────────────────────────────────────────── */
+.agents-section { padding: 80px 0; border-bottom: 1px solid var(--rule); }
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px; margin-top: 40px;
+}
+.agent-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 20px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.agent-card:hover {
+  border-color: var(--gold);
+  box-shadow: 0 4px 20px rgba(12,30,60,0.08);
+}
+.agent-phase-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 12px; display: block;
+}
+.agent-name {
+  font-family: 'Spectral', serif;
+  font-size: 15px; font-weight: 600;
+  color: var(--navy); margin-bottom: 6px;
+}
+.agent-role { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+.agent-caps { display: flex; flex-wrap: wrap; gap: 4px; }
+.cap {
+  font-size: 10px; font-family: 'JetBrains Mono', monospace;
+  background: var(--chip-bg); color: var(--muted);
+  padding: 2px 7px; border-radius: 2px;
+}
+
+/* ─ MCP Tools ──────────────────────────────────────── */
+.mcp-section { padding: 80px 0; background: var(--cream); border-bottom: 1px solid var(--rule); }
+.mcp-groups {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px; margin-top: 40px;
+}
+.mcp-group {
+  background: var(--paper); border: 1px solid var(--rule); padding: 24px;
+}
+.mcp-group-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--rule);
+}
+.mcp-tool {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--rule);
+}
+.mcp-tool:last-child { border-bottom: none; padding-bottom: 0; }
+.mcp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.dok  { background: var(--ok); }
+.derr { background: var(--err); }
+.doff { background: var(--faint); }
+.mcp-tool-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500; color: var(--navy);
+  margin-bottom: 2px;
+}
+.mcp-tool-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* ─ Quality Gate ───────────────────────────────────── */
+.quality-section { padding: 80px 0; border-bottom: 1px solid var(--rule); }
+.quality-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+  align-items: start; margin-top: 40px;
+}
+.scorecard {
+  background: var(--cream); border: 1px solid var(--rule);
+  overflow: hidden;
+}
+.sc-head {
+  background: var(--navy); padding: 16px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sc-head span {
+  font-family: 'Spectral', serif; font-size: 13px;
+  font-weight: 600; color: white;
+}
+.verdict {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 10px; background: rgba(45,106,79,0.3);
+  color: #6FCFA0; border: 1px solid rgba(45,106,79,0.5);
+}
+.sc-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 20px; border-bottom: 1px solid var(--rule);
+  font-size: 12px;
+}
+.sc-row:last-child { border-bottom: none; }
+.sc-row .criterion { color: var(--muted); }
+.dots { display: flex; gap: 3px; }
+.dot-f { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+.dot-e { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); }
+.verdicts-list { display: flex; flex-direction: column; gap: 12px; }
+.verd-row {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 16px; background: var(--cream); border-left: 3px solid var(--navy);
+}
+.verd-row.approve { border-left-color: var(--ok); }
+.verd-row.revise  { border-left-color: var(--warn); }
+.verd-row.reject  { border-left-color: var(--err); }
+.verd-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  white-space: nowrap; padding-top: 2px;
+}
+.tag-approve { color: var(--ok); }
+.tag-revise  { color: var(--warn); }
+.tag-reject  { color: var(--err); }
+.verd-text strong { font-size: 13px; display: block; margin-bottom: 2px; color: var(--navy); }
+.verd-text p { font-size: 12px; color: var(--muted); max-width: none; }
+
+/* ─ Quick Start ────────────────────────────────────── */
+.qs-section { padding: 80px 0; background: var(--navy); }
+.qs-section h2 { color: white; }
+.qs-section .section-label { color: var(--gold); }
+.qs-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px; margin-top: 40px; align-items: start;
+}
+.code-block {
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+  padding: 20px 24px; overflow-x: auto;
+}
+.code-block pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; line-height: 1.8; color: rgba(255,255,255,0.8);
+  white-space: pre; tab-size: 2;
+}
+.code-block pre .comment { color: rgba(201,160,64,0.6); }
+.code-block pre .cmd     { color: #9ECBFF; }
+.code-block pre .arg     { color: #B5EAD7; }
+.code-block pre .flag    { color: #FFDAC1; }
+.code-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 10px; display: block;
+}
+.intake-list { display: flex; flex-direction: column; gap: 10px; }
+.intake-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 16px; background: rgba(255,255,255,0.05);
+  border-left: 2px solid var(--gold);
+}
+.intake-key {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--gold); white-space: nowrap; flex-shrink: 0; min-width: 90px;
+}
+.intake-val { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
+/* ─ Footer ─────────────────────────────────────────── */
+footer {
+  background: #070F1E;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 40px 0;
+}
+.footer-inner {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-left .fl-name {
+  font-family: 'Spectral', serif; font-size: 16px;
+  font-weight: 600; color: white; margin-bottom: 4px;
+}
+.footer-left .fl-sub { font-size: 12px; color: rgba(255,255,255,0.35); }
+.footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-links a {
+  font-size: 13px; color: rgba(255,255,255,0.45);
+  text-decoration: none; transition: color .15s;
+}
+.footer-links a:hover { color: var(--gold); }
+
+/* ─ Responsive ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .about-grid, .quality-grid, .qs-grid { grid-template-columns: 1fr; gap: 32px; }
+  .nav-links { display: none; }
+  .pipeline-flow { gap: 0; }
+  .phase { flex: 0 0 160px; }
+  .hero { padding: 64px 0 56px; }
+}
+@media (max-width: 480px) {
+  .hero-stats { gap: 8px; }
+  .hstat { padding: 8px 12px; }
+  .hstat .n { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ══════════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <span class="dot"></span>
+      AI Research Lab
+    </a>
+    <div class="nav-links">
+      <a href="#pipeline" class="nav-link">Pipeline</a>
+      <a href="#agents" class="nav-link">Agents</a>
+      <a href="#tools" class="nav-link">MCP Tools</a>
+      <a href="#quickstart" class="nav-link">Quick Start</a>
+      <a href="https://github.com/charchitd/MyResearch_Lab" target="_blank" class="nav-gh">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">
+      <span class="hero-badge">Aston University · Research Lab</span>
+    </div>
+    <h1>AI Research <em>Lab</em></h1>
+    <p class="hero-sub">
+      A multi-agent academic workspace built on Claude Code. Five specialist AI agents run a gated five-phase pipeline — from novelty verification through peer-audited manuscript — with live scholarly search across 250 million papers.
+    </p>
+    <div class="hero-stats">
+      <div class="hstat"><span class="n">5</span><span class="l">Specialist<br>Agents</span></div>
+      <div class="hstat"><span class="n">5</span><span class="l">Pipeline<br>Phases</span></div>
+      <div class="hstat"><span class="n">250M+</span><span class="l">Papers<br>Searchable</span></div>
+      <div class="hstat"><span class="n">4</span><span class="l">Live Scholarly<br>Databases</span></div>
+      <div class="hstat"><span class="n">K1·K2·K3</span><span class="l">Writing<br>Modes</span></div>
+    </div>
+    <div class="hero-ctas">
+      <a href="https://github.com/charchitd/MyResearch_Lab" target="_blank" class="btn-primary">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        View on GitHub
+      </a>
+      <a href="#quickstart" class="btn-secondary">Quick Start →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ABOUT ══════════════════════════════════════════ -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <span class="section-label">About the Lab</span>
+        <h2>Rigorous research,<br>automated end-to-end</h2>
+        <div class="about-desc">
+          <p>The lab runs research questions through a five-phase pipeline of specialist Claude Code agents. Each specialist has a single remit: the research strategist verifies novelty, the literature specialist retrieves and cites papers, the data scientist runs analysis and produces figures, the academic writer drafts the manuscript, and the peer reviewer audits every claim.</p>
+          <p>Nothing advances without passing a scored quality gate. Every factual claim carries provenance — the tool that retrieved it, the query used, and the retrieval date. No fabricated citations; no rubber-stamping.</p>
+        </div>
+      </div>
+      <div class="principles">
+        <div class="principle">
+          <div class="principle-icon">🔬</div>
+          <div>
+            <strong>Empirical novelty verification</strong>
+            <p>Three distinct queries run across live scholarly databases before any angle is declared novel. Closest prior works are cited by DOI.</p>
+          </div>
+        </div>
+        <div class="principle">
+          <div class="principle-icon">📋</div>
+          <div>
+            <strong>Scored quality gates</strong>
+            <p>Every phase deliverable is scored 1–5 across five criteria. A score of ≤2 on any criterion forces revision before the pipeline advances.</p>
+          </div>
+        </div>
+        <div class="principle">
+          <div class="principle-icon">✍️</div>
+          <div>
+            <strong>Human-indistinguishable prose</strong>
+            <p>The ghost-writer layer applies sentence entropy, domain-specific lexical grounding, and irregular rhythm to produce writing that reads as naturally human.</p>
+          </div>
+        </div>
+        <div class="principle">
+          <div class="principle-icon">🔗</div>
+          <div>
+            <strong>Provenance on every claim</strong>
+            <p>Tool name, query string, and retrieval date travel with each fact from search through final manuscript.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PIPELINE ══════════════════════════════════════ -->
+<section class="pipeline-section" id="pipeline">
+  <div class="container">
+    <span class="section-label">Research Pipeline</span>
+    <h2>Five phases, one gated pipeline</h2>
+    <p>Phases run in order. Each must pass a PI scorecard before the next begins. The engine resumes from the last passed phase — a failed run picks up where it stopped.</p>
+    <div class="pipeline-flow">
+      <div class="phase">
+        <div class="phase-top">
+          <div class="phase-num gold">0</div>
+          <span class="phase-id-label">Bootstrap</span>
+        </div>
+        <div class="phase-name">User Intake &amp; MCP Inventory</div>
+        <div class="phase-owner">pi</div>
+        <div class="phase-del">Topic · docs · URLs · K1/K2/K3 mode · anti-AI flag → <code>00_user_intake.md</code></div>
+      </div>
+      <div class="phase-arrow">›</div>
+      <div class="phase">
+        <div class="phase-top">
+          <div class="phase-num">1</div>
+          <span class="phase-id-label">Strategy</span>
+        </div>
+        <div class="phase-name">Novelty Verification &amp; Experimental Design</div>
+        <div class="phase-owner">research-strategist</div>
+        <div class="phase-del">3+ search queries · closest prior works · <code>01_strategy.md</code></div>
+      </div>
+      <div class="phase-arrow">›</div>
+      <div class="phase">
+        <div class="phase-top">
+          <div class="phase-num">2</div>
+          <span class="phase-id-label">Literature</span>
+        </div>
+        <div class="phase-name">Paper Retrieval &amp; Citation Matrix</div>
+        <div class="phase-owner">literature-specialist</div>
+        <div class="phase-del">≥20 papers with DOI · BibTeX · <code>02_literature_matrix.md</code></div>
+      </div>
+      <div class="phase-arrow">›</div>
+      <div class="phase">
+        <div class="phase-top">
+          <div class="phase-num">3</div>
+          <span class="phase-id-label">Analysis</span>
+        </div>
+        <div class="phase-name">Simulation, Statistics &amp; Figures</div>
+        <div class="phase-owner">data-scientist</div>
+        <div class="phase-del">Reproducible code · figures · <code>RESULTS.md</code></div>
+      </div>
+      <div class="phase-arrow">›</div>
+      <div class="phase">
+        <div class="phase-top">
+          <div class="phase-num">4</div>
+          <span class="phase-id-label">Write · Audit</span>
+        </div>
+        <div class="phase-name">Manuscript Drafting &amp; Peer Audit</div>
+        <div class="phase-owner">academic-writer → peer-reviewer</div>
+        <div class="phase-del">Ghost-written K1/K2/K3 prose · zero open blockers</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AGENTS ════════════════════════════════════════ -->
+<section class="agents-section" id="agents">
+  <div class="container">
+    <span class="section-label">Specialist Agents</span>
+    <h2>Five specialists, one orchestrator</h2>
+    <p>Agents are defined in <code>agents/</code> and loaded into <code>.claude/agents/</code> at runtime. They report only to the PI and never communicate with each other.</p>
+    <div class="agents-grid">
+      <div class="agent-card">
+        <span class="agent-phase-badge">Phase 0 · Orchestrator</span>
+        <div class="agent-name">PI Orchestrator</div>
+        <div class="agent-role">Quality gate, delegation, scoring, user relay. Reads every artifact before approving.</div>
+        <div class="agent-caps">
+          <span class="cap">CLAUDE.md</span>
+          <span class="cap">Scorecards</span>
+          <span class="cap">Gate keeper</span>
+        </div>
+      </div>
+      <div class="agent-card">
+        <span class="agent-phase-badge">Phase 1</span>
+        <div class="agent-name">research-strategist</div>
+        <div class="agent-role">Turns a research interest into falsifiable hypotheses. Verifies novelty with live search before claiming any angle is open.</div>
+        <div class="agent-caps">
+          <span class="cap">Novelty check</span>
+          <span class="cap">H1–Hn</span>
+          <span class="cap">Study design</span>
+        </div>
+      </div>
+      <div class="agent-card">
+        <span class="agent-phase-badge">Phase 2</span>
+        <div class="agent-name">literature-specialist</div>
+        <div class="agent-role">Retrieves papers via live MCP databases, builds the citation matrix, exports BibTeX. Every claim carries DOI and retrieval date.</div>
+        <div class="agent-caps">
+          <span class="cap">Search</span>
+          <span class="cap">BibTeX</span>
+          <span class="cap">Provenance</span>
+        </div>
+      </div>
+      <div class="agent-card">
+        <span class="agent-phase-badge">Phase 3</span>
+        <div class="agent-name">data-scientist</div>
+        <div class="agent-role">Implements the approved experimental design as reproducible code, runs it, and produces figures and a RESULTS.md with labelled synthetic data.</div>
+        <div class="agent-caps">
+          <span class="cap">Analysis</span>
+          <span class="cap">Figures</span>
+          <span class="cap">Reproducible</span>
+        </div>
+      </div>
+      <div class="agent-card">
+        <span class="agent-phase-badge">Phase 4a</span>
+        <div class="agent-name">academic-writer</div>
+        <div class="agent-role">Drafts manuscript to target venue guidelines in K1, K2 or K3 mode with the anti-AI-watermark layer active by default.</div>
+        <div class="agent-caps">
+          <span class="cap">K1/K2/K3</span>
+          <span class="cap">Ghost-writer</span>
+          <span class="cap">Venue style</span>
+        </div>
+      </div>
+      <div class="agent-card">
+        <span class="agent-phase-badge">Phase 4b</span>
+        <div class="agent-name">peer-reviewer</div>
+        <div class="agent-role">Citation audit and adversarial red-team. Zero open BLOCKER items required before the PI approves the final manuscript.</div>
+        <div class="agent-caps">
+          <span class="cap">Citation audit</span>
+          <span class="cap">Red-team</span>
+          <span class="cap">BLOCKERs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MCP TOOLS ══════════════════════════════════════ -->
+<section class="mcp-section" id="tools">
+  <div class="container">
+    <span class="section-label">Live MCP Tools</span>
+    <h2>Scholarly search across 250M+ papers</h2>
+    <p>Cloud-hosted connectors are available through the Claude.ai MCP layer with no additional setup. Local servers are configured in <code>pipeline/mcp_servers.conf</code>.</p>
+    <div class="mcp-groups">
+      <div class="mcp-group">
+        <div class="mcp-group-title">Scholarly Search</div>
+        <div class="mcp-tool"><div class="mcp-dot dok"></div><div><div class="mcp-tool-name">Fast Track Literature</div><div class="mcp-tool-desc">250M records · OpenAlex · duplication test · gap saturation · Zotero import</div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot dok"></div><div><div class="mcp-tool-name">Consensus</div><div class="mcp-tool-desc">400M+ peer-reviewed papers · semantic search · ranked results</div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot dok"></div><div><div class="mcp-tool-name">PubMed</div><div class="mcp-tool-desc">Biomedical literature · full-text retrieval · article metadata</div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot dok"></div><div><div class="mcp-tool-name">Wiley Scholar Gateway</div><div class="mcp-tool-desc">Full-text Wiley journals · usage-capped</div></div></div>
+      </div>
+      <div class="mcp-group">
+        <div class="mcp-group-title">Reasoning &amp; Storage</div>
+        <div class="mcp-tool"><div class="mcp-dot dok"></div><div><div class="mcp-tool-name">sequential-thinking</div><div class="mcp-tool-desc">Structured multi-step reasoning for design trade-off analysis</div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot dok"></div><div><div class="mcp-tool-name">filesystem</div><div class="mcp-tool-desc">Scoped file access — sources/ outputs/ reviews/</div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot dok"></div><div><div class="mcp-tool-name">Claude Docs</div><div class="mcp-tool-desc">Living documents for collaborative drafts</div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot dok"></div><div><div class="mcp-tool-name">Google Drive</div><div class="mcp-tool-desc">File storage, sharing, and version history</div></div></div>
+      </div>
+      <div class="mcp-group">
+        <div class="mcp-group-title">Optional (off by default)</div>
+        <div class="mcp-tool"><div class="mcp-dot doff"></div><div><div class="mcp-tool-name">arXiv</div><div class="mcp-tool-desc">arXiv search + PDF download · needs <code>uvx</code></div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot doff"></div><div><div class="mcp-tool-name">Zotero</div><div class="mcp-tool-desc">Zotero desktop integration · local mode</div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot doff"></div><div><div class="mcp-tool-name">brave-search</div><div class="mcp-tool-desc">Web search · needs <code>BRAVE_API_KEY</code></div></div></div>
+        <div class="mcp-tool"><div class="mcp-dot doff"></div><div><div class="mcp-tool-name">GitHub</div><div class="mcp-tool-desc">Remote operations · needs <code>GITHUB_PAT</code></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ QUALITY GATE ══════════════════════════════════ -->
+<section class="quality-section" id="quality">
+  <div class="container">
+    <span class="section-label">Quality Protocol</span>
+    <h2>Nothing ships without a scorecard</h2>
+    <p>Every phase deliverable is scored before the pipeline advances. The PI reads the artifact — not the agent's summary.</p>
+    <div class="quality-grid">
+      <div class="scorecard">
+        <div class="sc-head">
+          <span>Phase 2 · literature-specialist · round 1</span>
+          <span class="verdict">APPROVE</span>
+        </div>
+        <div class="sc-row"><span class="criterion">Meets brief &amp; acceptance test</span><div class="dots"><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div></div></div>
+        <div class="sc-row"><span class="criterion">Technical rigor</span><div class="dots"><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-e"></div></div></div>
+        <div class="sc-row"><span class="criterion">Evidence &amp; provenance</span><div class="dots"><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div></div></div>
+        <div class="sc-row"><span class="criterion">Reproducibility</span><div class="dots"><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-e"></div></div></div>
+        <div class="sc-row"><span class="criterion">Scope discipline</span><div class="dots"><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div><div class="dot-f"></div></div></div>
+      </div>
+      <div class="verdicts-list">
+        <div class="verd-row approve">
+          <span class="verd-tag tag-approve">APPROVE</span>
+          <div class="verd-text"><strong>All criteria ≥ 3, no blockers</strong><p>Artifact promoted; pipeline advances to next phase.</p></div>
+        </div>
+        <div class="verd-row revise">
+          <span class="verd-tag tag-revise">REVISE</span>
+          <div class="verd-text"><strong>Any criterion ≤ 2 — max 2 rounds</strong><p>Scorecard returned to the same specialist. After two rounds, escalates to user.</p></div>
+        </div>
+        <div class="verd-row reject">
+          <span class="verd-tag tag-reject">REJECT</span>
+          <div class="verd-text"><strong>Wrong approach — not fixable</strong><p>Re-plan from scratch; root cause logged in run_log.md.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ QUICK START ════════════════════════════════════ -->
+<section class="qs-section" id="quickstart">
+  <div class="container">
+    <span class="section-label">Quick Start</span>
+    <h2>Running your first project</h2>
+    <div class="qs-grid">
+      <div>
+        <span class="code-label">Setup &amp; Run</span>
+        <div class="code-block"><pre><span class="comment"># Clone the lab</span>
+<span class="cmd">git clone</span> <span class="arg">https://github.com/charchitd/MyResearch_Lab.git</span>
+<span class="cmd">cd</span> MyResearch_Lab
+
+<span class="comment"># Bootstrap folders + sync agents</span>
+<span class="cmd">./run_lab.sh</span> <span class="flag">setup</span>
+
+<span class="comment"># Register MCP servers</span>
+<span class="cmd">./run_lab.sh</span> <span class="flag">mcp</span>
+
+<span class="comment"># Validate everything</span>
+<span class="cmd">./run_lab.sh</span> <span class="flag">doctor</span>
+
+<span class="comment"># Run Phase 0 intake (PI will ask for resources)</span>
+<span class="cmd">./run_lab.sh</span> <span class="flag">phase 0</span> <span class="arg">my-project</span> <span class="arg">"your research question"</span>
+
+<span class="comment"># Or run the full pipeline automatically</span>
+<span class="cmd">./run_lab.sh</span> <span class="flag">all</span> <span class="arg">my-project</span> <span class="arg">"your research question"</span></pre></div>
+      </div>
+      <div>
+        <span class="code-label">Phase 0 — What the PI asks for</span>
+        <div class="intake-list">
+          <div class="intake-item"><span class="intake-key">Topic</span><span class="intake-val">The core research question or objective</span></div>
+          <div class="intake-item"><span class="intake-key">Documents</span><span class="intake-val">PDFs, notes, datasets, draft manuscripts</span></div>
+          <div class="intake-item"><span class="intake-key">URLs</span><span class="intake-val">Seed papers, datasets, institutional pages</span></div>
+          <div class="intake-item"><span class="intake-key">Instructions</span><span class="intake-val">Venue, word limit, methodology, constraints</span></div>
+          <div class="intake-item"><span class="intake-key">Writing mode</span><span class="intake-val">K1 Academic · K2 Whitepaper · K3 Narrative</span></div>
+          <div class="intake-item"><span class="intake-key">Anti-AI</span><span class="intake-val">Human-indistinguishable prose layer (default: on)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <div class="fl-name">AI Research Lab</div>
+        <div class="fl-sub">Aston University · Built on Claude Code · 2026</div>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/charchitd/MyResearch_Lab" target="_blank">GitHub</a>
+        <a href="https://github.com/charchitd/MyResearch_Lab/blob/main/README.md" target="_blank">Documentation</a>
+        <a href="https://github.com/charchitd/MyResearch_Lab/tree/main/agents" target="_blank">Agents</a>
+        <a href="https://github.com/charchitd/MyResearch_Lab/tree/main/pipeline" target="_blank">Pipeline</a>
+        <a href="https://claude.com/claude-code" target="_blank">Claude Code</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
