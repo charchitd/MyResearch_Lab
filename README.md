@@ -20,6 +20,64 @@ Every specialist is a Claude Code sub-agent defined in `agents/`. They report on
 
 ---
 
+## Live Workflow
+
+```mermaid
+flowchart TD
+    U([👤 User]) -->|research question| PI
+
+    subgraph ORCHESTRATOR["PI Orchestrator — CLAUDE.md"]
+        PI[PI\nQuality Gate]
+    end
+
+    PI -->|Phase 1 brief| RS[research-strategist]
+    PI -->|Phase 2 brief| LS[literature-specialist]
+    PI -->|Phase 3 brief| DS[data-scientist]
+    PI -->|Phase 4a brief| AW[academic-writer]
+    PI -->|Phase 4b brief| PR[peer-reviewer]
+
+    RS -->|01_strategy.md| PI
+    LS -->|02_literature_matrix.md\nrefs.bib| PI
+    DS -->|03_analysis/\nRESULTS.md| PI
+    AW -->|04_manuscript.*| PI
+    PR -->|05_audit.md| PI
+
+    PI -->|APPROVE → promote| OUT[(outputs/\nproject/)]
+    PI -->|REVISE → retry| RS
+    PI -->|REVISE → retry| LS
+    PI -->|REVISE → retry| DS
+    PI -->|REVISE → retry| AW
+
+    subgraph MCP["Live MCP Tools"]
+        direction LR
+        FT[Fast Track\nLiterature]
+        CS[Consensus\n400M papers]
+        PM[PubMed]
+        WL[Wiley]
+        FS[filesystem]
+        ST[sequential-\nthinking]
+    end
+
+    LS -.->|search| FT
+    LS -.->|search| CS
+    LS -.->|search| PM
+    LS -.->|full-text| WL
+    DS -.->|read/write| FS
+    PI -.->|reasoning| ST
+
+    style ORCHESTRATOR fill:#1B5E40,color:#fff,stroke:#1B5E40
+    style OUT fill:#C4863A,color:#fff,stroke:#C4863A
+    style MCP fill:#f5f2ec,stroke:#ddd7cc,color:#1a1710
+    style PI fill:#1B5E40,color:#fff,stroke:#155233
+    style RS fill:#fdfbf8,stroke:#ddd7cc,color:#1a1710
+    style LS fill:#fdfbf8,stroke:#ddd7cc,color:#1a1710
+    style DS fill:#fdfbf8,stroke:#ddd7cc,color:#1a1710
+    style AW fill:#fdfbf8,stroke:#ddd7cc,color:#1a1710
+    style PR fill:#fdfbf8,stroke:#ddd7cc,color:#1a1710
+```
+
+---
+
 ## Pipeline
 
 Phases are defined in `pipeline/phases/` and run in filename order. The default pipeline:
