@@ -2,6 +2,36 @@
 
 ---
 
+## 2026-11-10 — Project: llm-sysrev — Phase 0 Bootstrap
+
+### User Intake Summary
+- **Slug:** llm-sysrev
+- **Topic:** LLMs as co-authors in systematic literature reviews — accuracy, bias, reproducibility
+- **Venue target:** Journal of Clinical Epidemiology / Systematic Reviews (BMC)
+- **Writing mode:** K1 (academic/peer-reviewed) + anti-AI-watermark active
+- **User docs:** None uploaded
+- **Seed URLs:** 2 DOIs provided (JCE 2023, BMJ EBM 2023)
+- **Intake file:** sources/llm-sysrev/00_user_intake.md ✓
+
+### Live Search Probe (Fast Track Literature — 2026-11-10)
+Query: "large language models systematic review accuracy bias reproducibility"
+Hits: ~125,492 | Top result: Scherbakov et al. 2025 (JAMIA) — 237 citations, rising fast
+Key papers identified: 8 highly relevant systematic reviews retrieved
+**Verdict: OPEN gap confirmed** — no direct paper combining all three dimensions (accuracy + bias + reproducibility) in a single empirical framework
+
+### Phase Plan
+
+| Phase | Owner | Deliverable | Acceptance test |
+|---|---|---|---|
+| 0 | PI | 00_user_intake.md, run_log.md | Intake written; MCP verified; plan recorded |
+| 1 | research-strategist | 01_strategy.md | 3 candidate angles, novelty log, selected design with H1–H3 |
+| 2 | literature-specialist | 02_literature_matrix.md, refs.bib | ≥20 papers with DOI + retrieval date; BibTeX exported |
+| 3 | data-scientist | 03_analysis/, RESULTS.md | Accuracy benchmark table; bias taxonomy; reproducibility checklist |
+| 4a | academic-writer | 04_manuscript.md | K1 prose; anti-AI rules applied; ~7,000 words |
+| 4b | peer-reviewer | 05_audit.md | Zero open BLOCKER items; all citations verified |
+
+---
+
 ## 2026-11-10 — Session start (MCP inventory)
 
 ### MCP Servers — Status
