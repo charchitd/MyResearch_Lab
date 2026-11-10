@@ -118,14 +118,31 @@ cd MyResearch_Lab
 # 4. Validate everything
 ./run_lab.sh doctor
 
-# 5. Run a single phase interactively (open Claude Code first)
-./run_lab.sh phase 1 my-project "Effect of sleep deprivation on working memory"
+# 5. Run Phase 0 (intake + MCP inventory) — the PI will ask for your resources
+./run_lab.sh phase 0 my-project "Effect of sleep deprivation on working memory"
 
-# 6. Or run the full pipeline automatically
+# 6. Or run the full pipeline automatically (Phase 0 intake runs first)
 ./run_lab.sh all my-project "Effect of sleep deprivation on working memory"
 ```
 
-The engine resumes from the last passed phase, so a failed or interrupted run just picks up where it left off.
+The engine resumes from the last passed phase, so a failed or interrupted run picks up where it left off.
+
+---
+
+## Phase 0 — User intake
+
+When Phase 0 runs, the PI asks for the following before touching any tools. All items are optional except the research topic.
+
+| Input | What to provide |
+|---|---|
+| **Research topic** | The core question or objective (can also be passed as the `<topic>` argument) |
+| **Documents / files** | PDFs, notes, datasets, draft manuscripts — copied to `sources/<project>/` |
+| **External URLs** | Papers, datasets, institutional pages to seed the literature search |
+| **Research instructions** | Target venue, word-count limits, methodology preferences, ethical constraints, prior work to build on or avoid |
+| **Writing mode** | K1 (academic/peer-reviewed), K2 (formal report/whitepaper), or K3 (book/narrative non-fiction) |
+| **Anti-AI-watermark** | Whether the academic-writer should apply human-indistinguishable prose rules (default: on) |
+
+Everything collected is written to `sources/<project>/00_user_intake.md` — the authoritative context brief passed to every downstream specialist.
 
 ---
 
