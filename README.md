@@ -24,7 +24,13 @@ Every specialist is a Claude Code sub-agent defined in `agents/`. They report on
 
 ```mermaid
 flowchart TD
-    U([👤 User]) -->|research question| PI
+    U([👤 User]) -->|"research question\ndocs · URLs · instructions\nK1/K2/K3 mode"| PH0
+
+    subgraph PHASE0["Phase 0 — Bootstrap"]
+        PH0[Intake\n00_user_intake.md\nMCP inventory\nProject plan]
+    end
+
+    PH0 --> PI
 
     subgraph ORCHESTRATOR["PI Orchestrator — CLAUDE.md"]
         PI[PI\nQuality Gate]
@@ -68,6 +74,8 @@ flowchart TD
     style ORCHESTRATOR fill:#1B5E40,color:#fff,stroke:#1B5E40
     style OUT fill:#C4863A,color:#fff,stroke:#C4863A
     style MCP fill:#f5f2ec,stroke:#ddd7cc,color:#1a1710
+    style PHASE0 fill:#f5f2ec,stroke:#C4863A,color:#1a1710
+    style PH0 fill:#FBF0E4,stroke:#C4863A,color:#1a1710
     style PI fill:#1B5E40,color:#fff,stroke:#155233
     style RS fill:#fdfbf8,stroke:#ddd7cc,color:#1a1710
     style LS fill:#fdfbf8,stroke:#ddd7cc,color:#1a1710
@@ -84,7 +92,7 @@ Phases are defined in `pipeline/phases/` and run in filename order. The default 
 
 | Phase | ID | Owner | Deliverable |
 |---|---|---|---|
-| Bootstrap / MCP inventory | `0` | PI | `reviews/run_log.md` |
+| Bootstrap / Intake | `0` | PI | `sources/<project>/00_user_intake.md`, `reviews/run_log.md` |
 | Research strategy | `1` | research-strategist | `outputs/_drafts/<project>/01_strategy.md` |
 | Literature review | `2` | literature-specialist | `02_literature_matrix.md`, `sources/<project>/refs.bib` |
 | Data & analysis | `3` | data-scientist | `03_analysis/` (code + figures + `RESULTS.md`) |
